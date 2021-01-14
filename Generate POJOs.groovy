@@ -14,15 +14,14 @@ import java.sql.Date
  */
 
 packageName = "com.qianmi.uc.qstore.domain.store"
-beanName ="SceneBean"
 
 typeMapping = [
   (~/(?i)int/)                      : "Integer",
   (~/(?i)long/)                      : "String",
   (~/(?i)number/)                      : "String",
   (~/(?i)float|double|decimal|real/): "Double",
-  (~/(?i)datetime|timestamp/)       : "java.util.Date",
-  (~/(?i)date/)                     : "java.util.Date",
+  (~/(?i)datetime|timestamp/)       : "java.time.LocalDateTime",
+  (~/(?i)date/)                     : "java.time.LocalDateTime",
   (~/(?i)time/)                     : "String",
   (~/(?i)/)                         : "String"
 ]
@@ -35,7 +34,7 @@ FILES.chooseDirectoryAndSave("Choose directory", "Choose where to store generate
 
 
 def generate(table, dir) {
-  def className = javaName(beanName, true)
+  def className = javaName(table.getName(), true)
   def fields = calcFields(table)
   new File(dir, className + ".java").withPrintWriter { out -> generate(out, className, fields,table) }
 }
@@ -111,10 +110,11 @@ def calcFields(table) {
 }
 
 def javaName(str, capitalize) {
-  def s = str.split(/(?<=[^\p{IsLetter}])/).collect { Case.LOWER.apply(it).capitalize() }
-          .join("").replaceAll(/[^\p{javaJavaIdentifierPart}]/, "_")
-  capitalize || s.length() == 1? s : Case.LOWER.apply(s[0]) + s[1..-1]
+    def s = str.split(/(?<=[^\p{IsLetter}])/).collect { Case.LOWER.apply(it).capitalize() }
+            .join("").replaceAll(/[^\p{javaJavaIdentifierPart}]/, "_")
+    capitalize || s.length() == 1? s : Case.LOWER.apply(s[0]) + s[1..-1]
 }
+
 static String changeStyle(String str, boolean toCamel){
     if(!str || str.size() <= 1)
         return str
